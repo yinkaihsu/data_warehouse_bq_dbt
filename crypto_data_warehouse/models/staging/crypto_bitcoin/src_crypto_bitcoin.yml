@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: crypto_bitcoin
+    project: bigquery-public-data
+    dataset: crypto_bitcoin
+    tables:
+      - name: transactions
+      - name: blocks
+
+  - name: crypto_bitcoin_cash
+    project: bigquery-public-data
+    dataset: crypto_bitcoin_cash
+    tables:
+      - name: transactions
+      - name: blocks

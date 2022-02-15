@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: fct_transactions
+    description: "Fact table of transactions data"
+    columns:
+      - name: transactions.hash
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
