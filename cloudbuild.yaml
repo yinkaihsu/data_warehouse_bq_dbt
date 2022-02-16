@@ -19,5 +19,5 @@
  images:
  - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
  substitutions:
-    _SERVICE_NAME: data_warehouse_bq_dbt # default value
+    _SERVICE_NAME: data-warehouse-bq-dbt # default value
     _REGION: asia-east1
