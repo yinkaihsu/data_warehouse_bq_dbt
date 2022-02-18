@@ -17,7 +17,7 @@
    - '--port'
    - '$_PORT'
    - '--set-secrets'
-   - '/secrets=dbt-admin_credential:latest'
+   - '/secrets/dbt-admin_credential.json=dbt-admin_credential:latest'
    - '--region'
    - '$_REGION'
  images:
