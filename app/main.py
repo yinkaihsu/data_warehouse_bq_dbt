@@ -2,28 +2,41 @@ import os
 from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
+from enum import Enum
+
+class DBTAction(str, Enum):
+    dbt_run = "run"
+    dbt_test = "test"
+    dbt_seed = "seed"
+    dbt_snapshot = "snapshot"
+    dbt_ls = "ls"
+    dbt_compile = "compile"
+    dbt_freshness = "freshness"
+    dbt_build = "build"
 
 class Selection(BaseModel):
-    name: Optional[str] = None
+    arguments: Optional[str] = None
 
 app = FastAPI()
 
 @app.get("/")
-def read_root():
+def hello_world():
     return {"Hello": "World"}
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Optional[str] = None):
     return {"item_id": item_id, "q": q}
 
-@app.get("/dbt_script")
+@app.get("/dbt-script")
 def run_dbt_script():
     stream = os.popen(f'cd crypto_data_warehouse && sh dbt_script.sh')
-    output = stream.read()
+    output = stream.readlines()
+    print(output)
     return output
 
-@app.post("/dbt/run")
-def dbt_run(selection: Selection):
-    stream = os.popen(f'cd crypto_data_warehouse && dbt run --profiles-dir . --select {selection.name}')
-    output = stream.read()
+@app.post("/dbt/{action}")
+def execute_dbt(action: DBTAction, selection: Selection):
+    stream = os.popen(f'cd crypto_data_warehouse && dbt {action} --profiles-dir . --select {selection.arguments}')
+    output = stream.readlines()
+    print(output)
     return output
