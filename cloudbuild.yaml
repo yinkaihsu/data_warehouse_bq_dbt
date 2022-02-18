@@ -14,10 +14,13 @@
    - '$_SERVICE_NAME'
    - '--image'
    - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
+   - '--port'
+   - '$_PORT'
    - '--region'
    - '$_REGION'
  images:
  - 'gcr.io/$PROJECT_ID/$_SERVICE_NAME:$COMMIT_SHA'
  substitutions:
     _SERVICE_NAME: data-warehouse-bq-dbt # default value
+    _PORT: 5000
     _REGION: asia-east1
