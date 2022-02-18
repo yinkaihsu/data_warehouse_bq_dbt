@@ -8,7 +8,7 @@ This is a project of data warehouse built on BigQuery using dbt with serverless.
 1. Add service account crediental file in folder `/secrets` with file naming `dbt-admin_credential.json`
 2. Run Docker Container
     ```zsh
-    sh ./start.sh
+    sh ./dbt_start.sh
     ```
 3. Run DBT commands in Docker Container 
     ```zsh
