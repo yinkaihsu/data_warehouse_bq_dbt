@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from enum import Enum
 
@@ -40,3 +40,7 @@ def execute_dbt(action: DBTAction, selection: Selection):
     output = stream.readlines()
     print(output)
     return output
+
+@app.post("/check-payload")
+async def get_body(request: Request):
+    return await request.json()
