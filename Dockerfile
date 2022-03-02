@@ -15,7 +15,7 @@ COPY app ./app
 COPY dbt_script.sh .
 
 # Copy the dbt directory for dbt tools.
-COPY crypto_data_warehouse ./crypto_data_warehouse
+COPY dbt ./dbt
 # It will be mount using GCP Secret Manager
 # COPY secrets/ /secrets
 
