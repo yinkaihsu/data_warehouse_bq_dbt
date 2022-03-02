@@ -1,2 +1,4 @@
-/secrets
-/logs
+secrets/
+logs/
+node_modules/
+.cubestore/
