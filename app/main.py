@@ -1,5 +1,7 @@
+import uvicorn
 import os
 import re
+from imp import reload
 from typing import Optional
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
@@ -46,4 +48,9 @@ def execute_dbt(action: DBTAction, selection: Selection):
 async def get_body(request: Request):
     response = await request.json()
     print(response)
+    headers = request.headers.items()
+    print(headers)
     return response
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
