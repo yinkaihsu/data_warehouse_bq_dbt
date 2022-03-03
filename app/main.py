@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Optional
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
@@ -43,4 +44,6 @@ def execute_dbt(action: DBTAction, selection: Selection):
 
 @app.post("/check-payload")
 async def get_body(request: Request):
-    return await request.json()
+    response = await request.json()
+    print(response)
+    return response
