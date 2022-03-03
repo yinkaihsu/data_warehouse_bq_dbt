@@ -24,7 +24,7 @@ RUN go build -v -o server
 FROM xemuliam/dbt:1.0.1-bigquery
 USER root
 WORKDIR /dbt
-COPY crypto_data_warehouse/ ./
+COPY dbt .
 # It will be mount using GCP Secret Manager
 # COPY secrets/ /secrets
 
