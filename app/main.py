@@ -29,14 +29,14 @@ def read_item(item_id: int, q: Optional[str] = None):
 
 @app.get("/dbt-script")
 def run_dbt_script():
-    stream = os.popen(f'cd crypto_data_warehouse && sh dbt_script.sh')
+    stream = os.popen(f'cd dbt && sh dbt_script.sh')
     output = stream.readlines()
     print(output)
     return output
 
 @app.post("/dbt/{action}")
 def execute_dbt(action: DBTAction, selection: Selection):
-    stream = os.popen(f'cd crypto_data_warehouse && dbt {action} --profiles-dir . --select {selection.arguments}')
+    stream = os.popen(f'cd dbt && dbt {action} --profiles-dir . --select {selection.arguments}')
     output = stream.readlines()
     print(output)
     return output
