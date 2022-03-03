@@ -2,3 +2,4 @@ secrets/
 logs/
 node_modules/
 .cubestore/
+__pycache__
