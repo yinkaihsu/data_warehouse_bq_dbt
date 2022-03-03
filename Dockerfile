@@ -7,7 +7,7 @@ USER root
 WORKDIR /code
 
 # Install the package dependencies in the requirements file.
-COPY requirements.txt .
+COPY app/requirements.txt .
 RUN pip install --upgrade -r /code/requirements.txt
 
 # Copy the app directory and dbt_script file for web server.
