@@ -43,17 +43,13 @@ This is a project of data warehouse built on BigQuery using dbt with serverless.
 
 ## Local Build FastAPI using HTTP requests to call dbt commands
 1. Add service account crediental file in folder `/secrets` with file naming `dbt-admin_credential.json`
-2. Run Docker Container
+2. Build Docker image
+    ```zsh
+    docker build -t data_warehouse_bq_dbt:latest .
+    ```
+3. Run Docker Container
     ```zsh
     sh ./app_start.sh
-    ```
-3. Run FastAPI server in Docker Container 
-    ```zsh
-    cd /app
-    # install python packages
-    pip install -r requirements.txt
-    # run FastAPI server
-    python main.py
     ```
 4. (Optional) Use OpenAPI documentations
     >   To access from your browser, navigate to:  http://localhost:5000/docs
