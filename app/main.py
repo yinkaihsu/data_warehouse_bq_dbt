@@ -3,11 +3,42 @@ import os
 import re
 import base64
 import json
-from imp import reload
-from typing import Optional, Dict
-from fastapi import FastAPI, Request, Depends, HTTPException
+from typing import Optional, Callable, List, Dict
+from fastapi import FastAPI, Request, Response, Body, Depends, HTTPException
+from fastapi.routing import APIRoute
 from pydantic import BaseModel
 from enum import Enum
+
+class PubsubRequest(Request):
+    async def body(self) -> bytes:
+        if not hasattr(self, "_body"):
+            body = await super().body()
+            payload = json.loads(body)
+            # print(payload)
+            if payload.get('message') and type(payload.get('message')) == dict:
+                message = payload.get('message')
+                # Please add attribute - [channel: pubsub] to Pub/Sub messages for FastAPI
+                if message.get('attributes') and type(message.get('attributes')) == dict and message.get('attributes').get('channel') == 'pubsub':
+                    print("Start decoding pub/sub messages...")
+                    try:
+                        data = message.get('data')
+                    except:
+                        raise HTTPException(status_code=404, detail="Google Pub/Sub Message data not found.")
+                    body = base64.b64decode(data)
+                    # print(json.loads(body))
+            self._body = body
+            print(json.loads(self._body))
+        return self._body
+
+class PubsubRoute(APIRoute):
+    def get_route_handler(self) -> Callable:
+        original_route_handler = super().get_route_handler()
+
+        async def custom_route_handler(request: Request) -> Response:
+            request = PubsubRequest(request.scope, request.receive)
+            return await original_route_handler(request)
+
+        return custom_route_handler
 
 class DBTAction(str, Enum):
     dbt_run = "run"
@@ -22,39 +53,17 @@ class DBTAction(str, Enum):
 class Selection(BaseModel):
     arguments: Optional[str] = None
 
-async def handle_pubsub_message(request: Request):
-    payload = await request.json()
-    print(payload)
-    if payload.get('message') and type(payload.get('message')) == dict:
-        message = payload.get('message')
-        # Please add attribute - [channel: pubsub] to Pub/Sub messages for FastAPI
-        if message.get('attributes') and type(message.get('attributes')) == dict and message.get('attributes').get('channel') == 'pubsub':
-            print("Start decoding pub/sub messages...")
-            try:
-                data = message.get('data')
-            except:
-                raise HTTPException(status_code=404, detail="Google Pub/Sub Message data not found.")
-            converted_payload = json.loads(base64.b64decode(data))
-            return converted_payload
-    return payload
-
 
 app = FastAPI()
+app.router.route_class = PubsubRoute
 
-@app.get("/")
-def hello_world():
-    return {"Hello": "World"}
+# @app.get("/")
+# def hello_world():
+#     return {"Hello": "World"}
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
-
-@app.get("/dbt-script")
-def run_dbt_script():
-    stream = os.popen(f'cd dbt && sh dbt_script.sh')
-    output = stream.readlines()
-    print(output)
-    return output
+# @app.get("/items/{item_id}")
+# def read_item(item_id: int, q: Optional[str] = None):
+#     return {"item_id": item_id, "q": q}
 
 @app.post("/dbt/{action}")
 def execute_dbt(action: DBTAction, selection: Selection):
@@ -63,14 +72,14 @@ def execute_dbt(action: DBTAction, selection: Selection):
     print(output)
     return output
 
-@app.post("/convert-pubsub-payload")
-async def get_body(request: Dict = Depends(handle_pubsub_message)):
-    print(request)
-    return request
+@app.post("/dbt-get-arguments")
+async def get_dbt_arguments(selection: Selection):
+    print(selection)
+    return selection
 
-@app.post("/pubsub/dbt/{action}")
-def execute_dbt(action: DBTAction, selection: Dict = Depends(handle_pubsub_message)):
-    stream = os.popen(f"cd dbt && dbt {action} --profiles-dir . --select {selection.get('arguments')}")
+@app.get("/dbt-run-script")
+def run_dbt_script():
+    stream = os.popen(f'cd dbt && sh dbt_script.sh')
     output = stream.readlines()
     print(output)
     return output
