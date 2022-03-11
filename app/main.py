@@ -50,7 +50,7 @@ class DBTAction(str, Enum):
     dbt_freshness = "freshness"
     dbt_build = "build"
 
-class Selection(BaseModel):
+class DBTSelection(BaseModel):
     arguments: Optional[str] = None
 
 
@@ -65,17 +65,20 @@ app.router.route_class = PubsubRoute
 # def read_item(item_id: int, q: Optional[str] = None):
 #     return {"item_id": item_id, "q": q}
 
+# check payload after processing (will auto handle pub/sub messages)
+@app.post("/payload-check")
+async def check_payload(request: Request):
+    payload = await request.json()
+    print(payload)
+    return payload
+
+### DBT Methods define below ###
 @app.post("/dbt/{action}")
-def execute_dbt(action: DBTAction, selection: Selection):
+def execute_dbt(action: DBTAction, selection: DBTSelection):
     stream = os.popen(f"cd dbt && dbt {action} --profiles-dir . --select {selection.arguments}")
     output = stream.readlines()
     print(output)
     return output
-
-@app.post("/dbt-get-arguments")
-async def get_dbt_arguments(selection: Selection):
-    print(selection)
-    return selection
 
 @app.get("/dbt-run-script")
 def run_dbt_script():
